@@ -1,4 +1,5 @@
 ---
+import { url } from '../lib/url';
 import { site, nav, whatsappLink } from '../data/site';
 import { packages } from '../data/packages';
 import Logo from './Logo.astro';
@@ -22,14 +23,14 @@ const year = new Date().getFullYear();
     <div>
       <h2>Explore</h2>
       <ul>
-        {nav.map((n) => <li><a href={n.href}>{n.label}</a></li>)}
+        {nav.map((n) => <li><a href={url(n.href)}>{n.label}</a></li>)}
       </ul>
     </div>
 
     <div>
       <h2>Popular trips</h2>
       <ul>
-        {popular.map((p) => <li><a href={`/itineraries/${p.slug}/`}>{p.title}</a></li>)}
+        {popular.map((p) => <li><a href={url(`/itineraries/${p.slug}/`)}>{p.title}</a></li>)}
       </ul>
     </div>
 

@@ -1,4 +1,5 @@
 ---
+import { url } from '../lib/url';
 import { site } from '../data/site';
 
 const destinations = [
@@ -12,7 +13,7 @@ const destinations = [
 ];
 ---
 
-<form class="finder" data-trip-finder data-wa={site.whatsapp} action="/contact/" aria-label="Plan your trip">
+<form class="finder" data-trip-finder data-wa={site.whatsapp} action={url('/contact/')} aria-label="Plan your trip">
   <div class="field">
     <label for="tf-where">Where to</label>
     <select id="tf-where" name="where">

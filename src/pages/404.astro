@@ -1,4 +1,5 @@
 ---
+import { url } from '../lib/url';
 import Base from '../layouts/Base.astro';
 ---
 <Base title="Page not found">
@@ -6,8 +7,8 @@ import Base from '../layouts/Base.astro';
     <h1>This page isn’t here</h1>
     <p class="lede">The link may be old. Our trips are all on the itineraries page.</p>
     <p style="margin-top:2rem;display:flex;gap:.75rem;flex-wrap:wrap">
-      <a class="btn btn--teal" href="/itineraries/">See itineraries</a>
-      <a class="btn btn--line" href="/">Go to the home page</a>
+      <a class="btn btn--teal" href={url('/itineraries/')}>See itineraries</a>
+      <a class="btn btn--line" href={url('/')}>Go to the home page</a>
     </p>
   </header>
 </Base>

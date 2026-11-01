@@ -1,4 +1,5 @@
 ---
+import { url } from '../lib/url';
 import TripFinder from './TripFinder.astro';
 import { whatsappLink } from '../data/site';
 
@@ -12,7 +13,7 @@ const { src } = Astro.props;
 <section class="hero" aria-labelledby="hero-title">
   <div class="frame" data-hero>
     {src ? (
-      <img class="art photo-art" src={src} alt="Kanchenjunga rising above the clouds, seen from the Darjeeling hills" fetchpriority="high" decoding="async" />
+      <img class="art photo-art" src={url(src)} alt="Kanchenjunga rising above the clouds, seen from the Darjeeling hills" fetchpriority="high" decoding="async" />
     ) : (
       <svg class="art" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Kanchenjunga at sunrise, seen from the Darjeeling hills">
         <defs>
@@ -74,7 +75,7 @@ const { src } = Astro.props;
           based in Bijanbari, Darjeeling.
         </p>
         <div class="actions">
-          <a class="btn btn--white" href="/itineraries/">See itineraries</a>
+          <a class="btn btn--white" href={url('/itineraries/')}>See itineraries</a>
           <a class="btn btn--line" href={whatsappLink('Hi Aaroma Holidays, I would like help planning a trip.')} target="_blank" rel="noopener">
             Ask on WhatsApp
           </a>

@@ -1,4 +1,5 @@
 ---
+import { url } from '../lib/url';
 /**
  * A photo, or, until real photos are added, a labelled placeholder that says
  * which shot belongs here. To swap in a real image, pass `src`
@@ -33,7 +34,7 @@ const [skyA, skyB, far, near] = tones[tone];
 {src ? (
   <img
     class:list={['photo', cls]}
-    src={src}
+    src={url(src)}
     alt={alt}
     loading={eager ? 'eager' : 'lazy'}
     decoding="async"

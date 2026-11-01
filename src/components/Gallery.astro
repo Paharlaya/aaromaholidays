@@ -2,31 +2,28 @@
 /**
  * "Ridge drift" gallery: photo cards drift slowly sideways in a loop. Each card
  * sits at a different height, so together they trace a mountain skyline, and
- * the edges fade into mist. CSS-only motion; pauses on hover, on focus, with the
- * pause button, and for people who prefer reduced motion.
+ * the edges fade into mist. Every card is the same size. CSS-only motion; pauses
+ * on hover and focus, and stays still for people who prefer reduced motion.
  */
 import Photo from './Photo.astro';
 import type { Tone } from '../data/packages';
 
-interface Shot { label: string; tone: Tone; src?: string; shape: 'tall' | 'wide' | 'square' }
+interface Shot { label: string; tone: Tone; src?: string }
 
 // Replace each with a real photo by adding `src: '/images/…'`.
 const shots: Shot[] = [
-  { label: 'Kanchenjunga above the clouds', tone: 'dawn', shape: 'wide', src: '/images/hero-kanchenjunga.avif' },
-  { label: 'Toy train on the Batasia Loop', tone: 'mist', shape: 'tall' },
-  { label: 'Tea pickers in Happy Valley', tone: 'forest', shape: 'square' },
-  { label: 'Gurudongmar Lake', tone: 'glacier', shape: 'wide' },
-  { label: 'Rhododendrons in Yumthang Valley', tone: 'dawn', shape: 'tall' },
-  { label: 'Prayer flags at Tsomgo Lake', tone: 'lake', shape: 'square' },
-  { label: 'Rumtek Monastery', tone: 'dusk', shape: 'tall' },
-  { label: 'Rafting on the Teesta', tone: 'glacier', shape: 'wide' },
+  { label: 'Kanchenjunga above the clouds', tone: 'dawn', src: '/images/hero-kanchenjunga.avif' },
+  { label: 'Toy train on the Batasia Loop', tone: 'mist' },
+  { label: 'Tea pickers in Happy Valley', tone: 'forest' },
+  { label: 'Gurudongmar Lake', tone: 'glacier' },
+  { label: 'Rhododendrons in Yumthang Valley', tone: 'dawn' },
+  { label: 'Prayer flags at Tsomgo Lake', tone: 'lake' },
+  { label: 'Rumtek Monastery', tone: 'dusk' },
+  { label: 'Rafting on the Teesta', tone: 'glacier' },
 ];
 
-// Vertical offsets (px) that trace a ridge line: low foothills, rising to a
-// summit in the middle, falling away again.
-const ridge = [96, 56, 72, 24, 0, 40, 16, 64];
-
-const ratio = { tall: '3 / 4', wide: '3 / 2', square: '1 / 1' };
+// Gentle vertical offsets (px) that trace a ridge line.
+const ridge = [40, 20, 32, 8, 0, 24, 12, 36];
 ---
 
 <div class="drift" data-drift>
@@ -34,7 +31,7 @@ const ratio = { tall: '3 / 4', wide: '3 / 2', square: '1 / 1' };
     {[0, 1].map((copy) => (
       <ul class="set" aria-hidden={copy === 1 ? 'true' : undefined}>
         {shots.map((s, i) => (
-          <li class:list={['card', s.shape]} style={`--lift:${ridge[i % ridge.length]}px`}>
+          <li class="card" style={`--lift:${ridge[i % ridge.length]}px`}>
             <button
               type="button"
               class="tile"
@@ -42,7 +39,7 @@ const ratio = { tall: '3 / 4', wide: '3 / 2', square: '1 / 1' };
               tabindex={copy === 1 ? -1 : undefined}
               aria-label={`Open photo: ${s.label}`}
             >
-              <Photo src={s.src} alt={s.label} tone={s.tone} ratio={ratio[s.shape]} />
+              <Photo src={s.src} alt={s.label} tone={s.tone} ratio="4 / 5" />
             </button>
             <p class="caption">{s.label}</p>
           </li>
@@ -50,11 +47,6 @@ const ratio = { tall: '3 / 4', wide: '3 / 2', square: '1 / 1' };
       </ul>
     ))}
   </div>
-
-  <button type="button" class="toggle" data-toggle aria-pressed="false">
-    <span class="when-playing">Pause gallery</span>
-    <span class="when-paused">Play gallery</span>
-  </button>
 </div>
 
 <dialog class="lightbox" data-lightbox aria-label="Photo viewer">
@@ -71,7 +63,7 @@ const ratio = { tall: '3 / 4', wide: '3 / 2', square: '1 / 1' };
   .drift {
     position: relative;
     overflow: hidden;
-    padding-block: 1rem 3.5rem;
+    padding-block: 1rem 3rem;
     /* Cards fade into mist at both edges */
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
     mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
@@ -84,8 +76,7 @@ const ratio = { tall: '3 / 4', wide: '3 / 2', square: '1 / 1' };
   }
 
   .drift:hover .track,
-  .drift:focus-within .track,
-  .drift.is-paused .track { animation-play-state: paused; }
+  .drift:focus-within .track { animation-play-state: paused; }
 
   @keyframes drift {
     to { transform: translateX(-50%); }
@@ -105,9 +96,7 @@ const ratio = { tall: '3 / 4', wide: '3 / 2', square: '1 / 1' };
     margin-right: clamp(1rem, 0.6rem + 1.4vw, 2rem);
     transform: translateY(var(--lift));
   }
-  .card.tall { width: clamp(180px, 15vw + 80px, 280px); }
-  .card.square { width: clamp(200px, 16vw + 90px, 300px); }
-  .card.wide { width: clamp(260px, 24vw + 110px, 440px); }
+  .card { width: clamp(210px, 14vw + 110px, 300px); }
 
   .tile {
     display: block;
@@ -136,30 +125,11 @@ const ratio = { tall: '3 / 4', wide: '3 / 2', square: '1 / 1' };
     font-size: var(--step--1);
   }
 
-  .toggle {
-    position: absolute;
-    right: var(--gutter);
-    bottom: 0.25rem;
-    padding: 0.45rem 0.9rem;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    background: var(--white);
-    color: var(--ink);
-    font-size: var(--step--1);
-    font-weight: 600;
-    cursor: pointer;
-  }
-  .toggle:hover { border-color: var(--teal); color: var(--teal); }
-  .when-paused { display: none; }
-  .is-paused .when-playing { display: none; }
-  .is-paused .when-paused { display: inline; }
-
   /* Reduced motion: no drift, just a strip people can scroll themselves */
   @media (prefers-reduced-motion: reduce) {
     .drift { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
     .track { animation: none; }
     .set[aria-hidden] { display: none; }
-    .toggle { display: none; }
   }
 
   /* Lightbox */
@@ -200,12 +170,6 @@ const ratio = { tall: '3 / 4', wide: '3 / 2', square: '1 / 1' };
 <script>
   const drift = document.querySelector<HTMLElement>('[data-drift]');
   const box = document.querySelector<HTMLDialogElement>('[data-lightbox]');
-
-  const toggle = drift?.querySelector<HTMLButtonElement>('[data-toggle]');
-  toggle?.addEventListener('click', () => {
-    const paused = drift!.classList.toggle('is-paused');
-    toggle.setAttribute('aria-pressed', String(paused));
-  });
 
   if (drift && box) {
     // One entry per photo (the second, looping copy points at the same index).

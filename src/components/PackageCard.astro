@@ -1,4 +1,5 @@
 ---
+import { url } from '../lib/url';
 import Photo from './Photo.astro';
 import { formatPrice, type Package } from '../data/packages';
 
@@ -12,7 +13,7 @@ const Heading = headingLevel;
 ---
 
 <article class:list={['card', { large }]} data-tags={pkg.tags.join(' ')}>
-  <a href={`/itineraries/${pkg.slug}/`} class="link">
+  <a href={url(`/itineraries/${pkg.slug}/`)} class="link">
     <div class="media">
       <Photo
         src={pkg.image.src}
