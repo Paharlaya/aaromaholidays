@@ -1,33 +1,65 @@
 ---
+/**
+ * "Ridge drift" gallery: photo cards drift slowly sideways in a loop. Each card
+ * sits at a different height, so together they trace a mountain skyline, and
+ * the edges fade into mist. CSS-only motion; pauses on hover, on focus, with the
+ * pause button, and for people who prefer reduced motion.
+ */
 import Photo from './Photo.astro';
 import type { Tone } from '../data/packages';
 
-interface Shot { label: string; tone: Tone; src?: string; size?: 'tall' | 'wide' }
+interface Shot { label: string; tone: Tone; src?: string; shape: 'tall' | 'wide' | 'square' }
 
 // Replace each with a real photo by adding `src: '/images/…'`.
 const shots: Shot[] = [
-  { label: 'Kanchenjunga from Tiger Hill at sunrise', tone: 'dawn', size: 'wide' },
-  { label: 'Toy train on the Batasia Loop', tone: 'mist', size: 'tall' },
-  { label: 'Tea pickers in Happy Valley', tone: 'forest' },
-  { label: 'Gurudongmar Lake', tone: 'glacier' },
-  { label: 'Rhododendrons in Yumthang Valley', tone: 'dawn', size: 'tall' },
-  { label: 'Prayer flags at Tsomgo Lake', tone: 'lake' },
-  { label: 'Rumtek Monastery', tone: 'dusk' },
-  { label: 'Rafting on the Teesta', tone: 'glacier', size: 'wide' },
+  { label: 'Kanchenjunga above the clouds', tone: 'dawn', shape: 'wide', src: '/images/hero-kanchenjunga.avif' },
+  { label: 'Toy train on the Batasia Loop', tone: 'mist', shape: 'tall' },
+  { label: 'Tea pickers in Happy Valley', tone: 'forest', shape: 'square' },
+  { label: 'Gurudongmar Lake', tone: 'glacier', shape: 'wide' },
+  { label: 'Rhododendrons in Yumthang Valley', tone: 'dawn', shape: 'tall' },
+  { label: 'Prayer flags at Tsomgo Lake', tone: 'lake', shape: 'square' },
+  { label: 'Rumtek Monastery', tone: 'dusk', shape: 'tall' },
+  { label: 'Rafting on the Teesta', tone: 'glacier', shape: 'wide' },
 ];
+
+// Vertical offsets (px) that trace a ridge line: low foothills, rising to a
+// summit in the middle, falling away again.
+const ridge = [96, 56, 72, 24, 0, 40, 16, 64];
+
+const ratio = { tall: '3 / 4', wide: '3 / 2', square: '1 / 1' };
 ---
 
-<div class="gallery" data-gallery>
-  {shots.map((s, i) => (
-    <button type="button" class:list={['tile', s.size]} data-index={i} aria-label={`Open photo: ${s.label}`}>
-      <Photo src={s.src} alt={s.label} label={s.label} tone={s.tone} ratio="auto" />
-    </button>
-  ))}
+<div class="drift" data-drift>
+  <div class="track">
+    {[0, 1].map((copy) => (
+      <ul class="set" aria-hidden={copy === 1 ? 'true' : undefined}>
+        {shots.map((s, i) => (
+          <li class:list={['card', s.shape]} style={`--lift:${ridge[i % ridge.length]}px`}>
+            <button
+              type="button"
+              class="tile"
+              data-index={i}
+              tabindex={copy === 1 ? -1 : undefined}
+              aria-label={`Open photo: ${s.label}`}
+            >
+              <Photo src={s.src} alt={s.label} tone={s.tone} ratio={ratio[s.shape]} />
+            </button>
+            <p class="caption">{s.label}</p>
+          </li>
+        ))}
+      </ul>
+    ))}
+  </div>
+
+  <button type="button" class="toggle" data-toggle aria-pressed="false">
+    <span class="when-playing">Pause gallery</span>
+    <span class="when-paused">Play gallery</span>
+  </button>
 </div>
 
 <dialog class="lightbox" data-lightbox aria-label="Photo viewer">
   <div class="stage" data-stage></div>
-  <p class="caption" data-caption></p>
+  <p class="lb-caption" data-caption></p>
   <div class="controls">
     <button type="button" class="btn btn--white" data-prev>Previous</button>
     <button type="button" class="btn btn--white" data-next>Next</button>
@@ -36,48 +68,115 @@ const shots: Shot[] = [
 </dialog>
 
 <style>
-  .gallery {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-auto-rows: clamp(160px, 18vw, 240px);
-    grid-auto-flow: dense;
-    gap: clamp(0.5rem, 0.3rem + 0.8vw, 1rem);
+  .drift {
+    position: relative;
+    overflow: hidden;
+    padding-block: 1rem 3.5rem;
+    /* Cards fade into mist at both edges */
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
   }
 
+  .track {
+    display: flex;
+    width: max-content;
+    animation: drift 80s linear infinite;
+  }
+
+  .drift:hover .track,
+  .drift:focus-within .track,
+  .drift.is-paused .track { animation-play-state: paused; }
+
+  @keyframes drift {
+    to { transform: translateX(-50%); }
+  }
+
+  .set {
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .card {
+    flex: none;
+    /* margin, not gap, so both copies are exactly the same width and the loop is seamless */
+    margin-right: clamp(1rem, 0.6rem + 1.4vw, 2rem);
+    transform: translateY(var(--lift));
+  }
+  .card.tall { width: clamp(180px, 15vw + 80px, 280px); }
+  .card.square { width: clamp(200px, 16vw + 90px, 300px); }
+  .card.wide { width: clamp(260px, 24vw + 110px, 440px); }
+
   .tile {
-    position: relative;
+    display: block;
+    width: 100%;
     padding: 0;
     border: 0;
     border-radius: var(--radius);
     overflow: hidden;
     background: var(--teal-wash);
     cursor: zoom-in;
+    box-shadow: 0 24px 40px -28px rgb(10 102 98 / 0.55);
+    transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
   }
-  .tile.wide { grid-column: span 2; }
-  .tile.tall { grid-row: span 2; }
+  .tile:hover,
+  .tile:focus-visible {
+    transform: translateY(-8px);
+    box-shadow: 0 32px 48px -28px rgb(10 102 98 / 0.65);
+  }
 
-  .tile :global(.photo) {
+  .tile :global(.photo) { transition: transform 0.8s var(--ease); }
+  .tile:hover :global(.photo) { transform: scale(1.04); }
+
+  .caption {
+    margin-top: 0.75rem;
+    color: var(--ink-soft);
+    font-size: var(--step--1);
+  }
+
+  .toggle {
     position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    aspect-ratio: auto !important;
+    right: var(--gutter);
+    bottom: 0.25rem;
+    padding: 0.45rem 0.9rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--white);
+    color: var(--ink);
+    font-size: var(--step--1);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .toggle:hover { border-color: var(--teal); color: var(--teal); }
+  .when-paused { display: none; }
+  .is-paused .when-playing { display: none; }
+  .is-paused .when-paused { display: inline; }
+
+  /* Reduced motion: no drift, just a strip people can scroll themselves */
+  @media (prefers-reduced-motion: reduce) {
+    .drift { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
+    .track { animation: none; }
+    .set[aria-hidden] { display: none; }
+    .toggle { display: none; }
   }
 
+  /* Lightbox */
   .lightbox {
     width: min(1100px, 100vw - 2rem);
     max-height: calc(100vh - 2rem);
     padding: 1rem;
     border: 0;
     border-radius: var(--radius-lg);
-    background: var(--ink);
+    background: var(--teal-deep);
     color: var(--white);
   }
-  .lightbox::backdrop { background: rgb(0 0 0 / 0.75); }
+  .lightbox::backdrop { background: rgb(4 40 38 / 0.8); }
 
   .stage {
     position: relative;
-    aspect-ratio: 16 / 10;
+    aspect-ratio: 3 / 2;
     max-height: 70vh;
     margin-inline: auto;
     border-radius: var(--radius);
@@ -91,44 +190,42 @@ const shots: Shot[] = [
     aspect-ratio: auto !important;
   }
 
-  .caption { margin: 1rem 0.25rem 0; }
+  .lb-caption { margin: 1rem 0.25rem 0; }
 
-  .controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 1rem;
-  }
+  .controls { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
   .controls .close { margin-left: auto; color: var(--white); }
   .controls .close:hover { background: var(--white); color: var(--ink); }
-
-  @media (max-width: 720px) {
-    .gallery { grid-template-columns: repeat(2, 1fr); }
-  }
 </style>
 
 <script>
-  const gallery = document.querySelector<HTMLElement>('[data-gallery]');
+  const drift = document.querySelector<HTMLElement>('[data-drift]');
   const box = document.querySelector<HTMLDialogElement>('[data-lightbox]');
 
-  if (gallery && box) {
-    const tiles = [...gallery.querySelectorAll<HTMLButtonElement>('.tile')];
+  const toggle = drift?.querySelector<HTMLButtonElement>('[data-toggle]');
+  toggle?.addEventListener('click', () => {
+    const paused = drift!.classList.toggle('is-paused');
+    toggle.setAttribute('aria-pressed', String(paused));
+  });
+
+  if (drift && box) {
+    // One entry per photo (the second, looping copy points at the same index).
+    const originals = [...drift.querySelectorAll<HTMLElement>('.set:first-child .tile')];
     const stage = box.querySelector<HTMLElement>('[data-stage]')!;
     const caption = box.querySelector<HTMLElement>('[data-caption]')!;
     let current = 0;
     let opener: HTMLElement | null = null;
 
     const show = (i: number) => {
-      current = (i + tiles.length) % tiles.length;
-      const photo = tiles[current].querySelector('.photo');
+      current = (i + originals.length) % originals.length;
+      const photo = originals[current].querySelector('.photo');
       stage.replaceChildren(photo ? photo.cloneNode(true) : document.createTextNode(''));
       caption.textContent = photo?.getAttribute('aria-label') ?? photo?.getAttribute('alt') ?? '';
     };
 
-    tiles.forEach((t, i) =>
+    drift.querySelectorAll<HTMLButtonElement>('.tile').forEach((t) =>
       t.addEventListener('click', () => {
         opener = t;
-        show(i);
+        show(Number(t.dataset.index));
         box.showModal();
       }),
     );
