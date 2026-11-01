@@ -1,0 +1,242 @@
+---
+import Base from '../../layouts/Base.astro';
+import Photo from '../../components/Photo.astro';
+import PackageCard from '../../components/PackageCard.astro';
+import { packages, formatPrice, tagLabels, type Package } from '../../data/packages';
+import { site, whatsappLink } from '../../data/site';
+
+export function getStaticPaths() {
+  return packages.map((pkg) => ({ params: { slug: pkg.slug }, props: { pkg } }));
+}
+
+interface Props { pkg: Package }
+const { pkg } = Astro.props;
+
+const enquiry = whatsappLink(`Hi Aaroma Holidays, I'm interested in the "${pkg.title}" trip (${pkg.duration}). Can you send me a quote?`);
+
+const related = packages
+  .filter((p) => p.slug !== pkg.slug && p.tags.some((t) => pkg.tags.includes(t)))
+  .slice(0, 3);
+
+const productLd = {
+  '@context': 'https://schema.org',
+  '@type': 'TouristTrip',
+  name: pkg.title,
+  description: pkg.summary,
+  itinerary: pkg.route.map((name) => ({ '@type': 'Place', name })),
+  offers: { '@type': 'Offer', price: pkg.priceFrom, priceCurrency: 'INR' },
+  provider: { '@type': 'TravelAgency', name: site.name, url: site.url },
+};
+---
+
+<Base title={`${pkg.title}, ${pkg.duration}`} description={pkg.summary}>
+  <script type="application/ld+json" set:html={JSON.stringify(productLd)} />
+
+  <header class="page-head wrap head">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <a href="/itineraries/">Itineraries</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">{pkg.title}</span>
+    </nav>
+    <h1>{pkg.title}</h1>
+    <p class="lede">{pkg.summary}</p>
+  </header>
+
+  <div class="wrap">
+    <div class="cover">
+      <Photo src={pkg.image.src} alt={pkg.image.label} label={pkg.image.label} tone={pkg.image.tone} ratio="21 / 9" eager />
+    </div>
+  </div>
+
+  <div class="wrap layout">
+    <div class="main">
+      <dl class="facts">
+        <div><dt>Length</dt><dd>{pkg.duration}</dd></div>
+        <div><dt>Route</dt><dd>{pkg.route.join(' to ')}</dd></div>
+        <div><dt>Good for</dt><dd>{pkg.tags.map((t) => tagLabels[t]).join(', ')}</dd></div>
+      </dl>
+
+      <section aria-labelledby="highlights-title">
+        <h2 id="highlights-title">Highlights</h2>
+        <ul class="highlights">
+          {pkg.highlights.map((h) => <li>{h}</li>)}
+        </ul>
+      </section>
+
+      <section aria-labelledby="plan-title">
+        <h2 id="plan-title">Day by day</h2>
+        <ol class="days">
+          {pkg.days.map((d, i) => (
+            <li>
+              <p class="day-num">Day {i + 1}</p>
+              <div>
+                <h3>{d.title}</h3>
+                <p>{d.text}</p>
+                {d.stay && <p class="stay">Overnight in {d.stay}</p>}
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section class="incl" aria-label="What's included">
+        <div>
+          <h2>Included</h2>
+          <ul class="yes">{pkg.includes.map((i) => <li>{i}</li>)}</ul>
+        </div>
+        <div>
+          <h2>Not included</h2>
+          <ul class="no">{pkg.excludes.map((i) => <li>{i}</li>)}</ul>
+        </div>
+      </section>
+    </div>
+
+    <aside class="book" aria-label="Book this trip">
+      <div class="book-card">
+        <p class="from">Starting from</p>
+        <p class="price">{formatPrice(pkg.priceFrom)}</p>
+        <p class="price-note">Final price depends on dates, hotel category and group size.</p>
+        <a class="btn btn--teal" href={enquiry} target="_blank" rel="noopener">Get a quote on WhatsApp</a>
+        <a class="btn btn--line" href={`tel:${site.phones[0].tel}`}>Call {site.phones[0].display}</a>
+        <p class="price-note">Or email <a class="text-link" href={`mailto:${site.email}?subject=${encodeURIComponent(pkg.title)}`}>{site.email}</a></p>
+      </div>
+    </aside>
+  </div>
+
+  {related.length > 0 && (
+    <section class="section section--wash" aria-labelledby="related-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="related-title">You might also like</h2>
+          <a class="text-link" href="/itineraries/">All itineraries</a>
+        </div>
+        <div class="related">
+          {related.map((p) => <PackageCard pkg={p} />)}
+        </div>
+      </div>
+    </section>
+  )}
+</Base>
+
+<style>
+  .head h1 { max-width: 18ch; }
+
+  .crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    color: var(--ink-muted);
+    font-size: var(--step--1);
+  }
+  .crumbs a { color: var(--teal); }
+
+  .cover { border-radius: var(--radius-lg); overflow: hidden; }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: clamp(2rem, 1rem + 4vw, 5rem);
+    align-items: start;
+    padding-block: clamp(2.5rem, 2rem + 2vw, 4rem) var(--section);
+  }
+
+  .main { display: grid; gap: clamp(2.5rem, 2rem + 2vw, 4rem); }
+  .main h2 { font-size: var(--step-3); margin-bottom: 1.5rem; }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem 2rem;
+    margin: 0;
+    padding-block: 1.5rem;
+    border-block: 1px solid var(--line);
+  }
+  .facts dt { color: var(--ink-muted); font-size: var(--step--1); }
+  .facts dd { margin: 0.2rem 0 0; color: var(--ink); font-weight: 600; }
+
+  .highlights {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .highlights li {
+    padding: 0.45rem 1rem;
+    border-radius: 999px;
+    background: var(--teal-wash);
+    color: var(--teal-deep);
+    font-weight: 500;
+  }
+
+  .days { margin: 0; padding: 0; list-style: none; }
+  .days li {
+    display: grid;
+    grid-template-columns: 6rem 1fr;
+    gap: 1rem;
+    padding-block: 1.5rem;
+    border-top: 1px solid var(--line);
+  }
+  .days li:last-child { border-bottom: 1px solid var(--line); }
+  .day-num {
+    color: var(--teal);
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    font-style: italic;
+  }
+  .days h3 { font-size: var(--step-1); margin-bottom: 0.4rem; }
+  .stay { margin-top: 0.5rem; color: var(--ink-muted); font-size: var(--step--1); }
+
+  .incl { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+  .incl h2 { font-size: var(--step-2); margin-bottom: 1rem; }
+  .incl ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.6rem; }
+  .incl li { position: relative; padding-left: 1.6rem; }
+  .incl li::before {
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-weight: 600;
+  }
+  .yes li::before { content: '✓'; color: var(--teal); }
+  .no li::before { content: '–'; color: var(--ink-muted); }
+
+  .book { position: sticky; top: 7rem; }
+  .book-card {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1.75rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--white);
+    box-shadow: 0 30px 60px -40px rgb(7 67 65 / 0.4);
+  }
+  .from { color: var(--ink-muted); font-size: var(--step--1); }
+  .price {
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: var(--step-4);
+    line-height: 1;
+  }
+  .price-note { color: var(--ink-muted); font-size: var(--step--1); }
+  .book-card .btn--line { color: var(--ink); }
+
+  .related {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(1rem, 0.5rem + 1.5vw, 2rem);
+  }
+
+  @media (max-width: 960px) {
+    .layout { grid-template-columns: 1fr; }
+    .book { position: static; }
+    .related { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .facts { grid-template-columns: 1fr; }
+    .days li { grid-template-columns: 1fr; gap: 0.25rem; }
+    .incl { grid-template-columns: 1fr; }
+    .related { grid-template-columns: 1fr; }
+  }
+</style>

@@ -1,0 +1,146 @@
+---
+import Photo from './Photo.astro';
+import type { Tone } from '../data/packages';
+
+interface Shot { label: string; tone: Tone; src?: string; size?: 'tall' | 'wide' }
+
+// Replace each with a real photo by adding `src: '/images/…'`.
+const shots: Shot[] = [
+  { label: 'Kanchenjunga from Tiger Hill at sunrise', tone: 'dawn', size: 'wide' },
+  { label: 'Toy train on the Batasia Loop', tone: 'mist', size: 'tall' },
+  { label: 'Tea pickers in Happy Valley', tone: 'forest' },
+  { label: 'Gurudongmar Lake', tone: 'glacier' },
+  { label: 'Rhododendrons in Yumthang Valley', tone: 'dawn', size: 'tall' },
+  { label: 'Prayer flags at Tsomgo Lake', tone: 'lake' },
+  { label: 'Rumtek Monastery', tone: 'dusk' },
+  { label: 'Rafting on the Teesta', tone: 'glacier', size: 'wide' },
+];
+---
+
+<div class="gallery" data-gallery>
+  {shots.map((s, i) => (
+    <button type="button" class:list={['tile', s.size]} data-index={i} aria-label={`Open photo: ${s.label}`}>
+      <Photo src={s.src} alt={s.label} label={s.label} tone={s.tone} ratio="auto" />
+    </button>
+  ))}
+</div>
+
+<dialog class="lightbox" data-lightbox aria-label="Photo viewer">
+  <div class="stage" data-stage></div>
+  <p class="caption" data-caption></p>
+  <div class="controls">
+    <button type="button" class="btn btn--white" data-prev>Previous</button>
+    <button type="button" class="btn btn--white" data-next>Next</button>
+    <button type="button" class="btn btn--line close" data-close>Close</button>
+  </div>
+</dialog>
+
+<style>
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: clamp(160px, 18vw, 240px);
+    grid-auto-flow: dense;
+    gap: clamp(0.5rem, 0.3rem + 0.8vw, 1rem);
+  }
+
+  .tile {
+    position: relative;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--teal-wash);
+    cursor: zoom-in;
+  }
+  .tile.wide { grid-column: span 2; }
+  .tile.tall { grid-row: span 2; }
+
+  .tile :global(.photo) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto !important;
+  }
+
+  .lightbox {
+    width: min(1100px, 100vw - 2rem);
+    max-height: calc(100vh - 2rem);
+    padding: 1rem;
+    border: 0;
+    border-radius: var(--radius-lg);
+    background: var(--ink);
+    color: var(--white);
+  }
+  .lightbox::backdrop { background: rgb(0 0 0 / 0.75); }
+
+  .stage {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    max-height: 70vh;
+    margin-inline: auto;
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .stage :global(.photo) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto !important;
+  }
+
+  .caption { margin: 1rem 0.25rem 0; }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  .controls .close { margin-left: auto; color: var(--white); }
+  .controls .close:hover { background: var(--white); color: var(--ink); }
+
+  @media (max-width: 720px) {
+    .gallery { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+
+<script>
+  const gallery = document.querySelector<HTMLElement>('[data-gallery]');
+  const box = document.querySelector<HTMLDialogElement>('[data-lightbox]');
+
+  if (gallery && box) {
+    const tiles = [...gallery.querySelectorAll<HTMLButtonElement>('.tile')];
+    const stage = box.querySelector<HTMLElement>('[data-stage]')!;
+    const caption = box.querySelector<HTMLElement>('[data-caption]')!;
+    let current = 0;
+    let opener: HTMLElement | null = null;
+
+    const show = (i: number) => {
+      current = (i + tiles.length) % tiles.length;
+      const photo = tiles[current].querySelector('.photo');
+      stage.replaceChildren(photo ? photo.cloneNode(true) : document.createTextNode(''));
+      caption.textContent = photo?.getAttribute('aria-label') ?? photo?.getAttribute('alt') ?? '';
+    };
+
+    tiles.forEach((t, i) =>
+      t.addEventListener('click', () => {
+        opener = t;
+        show(i);
+        box.showModal();
+      }),
+    );
+
+    box.querySelector('[data-prev]')?.addEventListener('click', () => show(current - 1));
+    box.querySelector('[data-next]')?.addEventListener('click', () => show(current + 1));
+    box.querySelector('[data-close]')?.addEventListener('click', () => box.close());
+    box.addEventListener('click', (e) => { if (e.target === box) box.close(); });
+    box.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') show(current - 1);
+      if (e.key === 'ArrowRight') show(current + 1);
+    });
+    box.addEventListener('close', () => opener?.focus());
+  }
+</script>

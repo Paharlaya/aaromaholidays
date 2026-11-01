@@ -1,0 +1,92 @@
+---
+import { site } from '../data/site';
+
+const destinations = [
+  'Darjeeling',
+  'Gangtok & East Sikkim',
+  'North Sikkim (Lachen, Lachung)',
+  'Darjeeling + Sikkim',
+  'Kalimpong',
+  'Dooars',
+  'Not sure yet',
+];
+---
+
+<form class="finder" data-trip-finder data-wa={site.whatsapp} action="/contact/" aria-label="Plan your trip">
+  <div class="field">
+    <label for="tf-where">Where to</label>
+    <select id="tf-where" name="where">
+      {destinations.map((d) => <option>{d}</option>)}
+    </select>
+  </div>
+  <div class="field">
+    <label for="tf-when">When</label>
+    <input id="tf-when" name="when" type="month" />
+  </div>
+  <div class="field">
+    <label for="tf-days">Days</label>
+    <select id="tf-days" name="days">
+      <option>2–3 days</option>
+      <option selected>4–5 days</option>
+      <option>6–7 days</option>
+      <option>8 days or more</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="tf-people">Travellers</label>
+    <input id="tf-people" name="people" type="number" min="1" max="60" value="2" inputmode="numeric" />
+  </div>
+  <button class="btn btn--teal" type="submit">Get a quote</button>
+  <p class="note">Opens WhatsApp with your trip details filled in.</p>
+</form>
+
+<style>
+  .finder {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 0.8fr auto;
+    align-items: end;
+    gap: 1rem;
+    padding: 1.25rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--white);
+    box-shadow: 0 30px 60px -30px rgb(7 67 65 / 0.35);
+  }
+
+  .finder .btn { min-height: 48px; }
+
+  .note {
+    grid-column: 1 / -1;
+    color: var(--ink-muted);
+    font-size: var(--step--1);
+  }
+
+  @media (max-width: 960px) {
+    .finder { grid-template-columns: 1fr 1fr; }
+    .finder .btn { grid-column: 1 / -1; }
+  }
+  @media (max-width: 480px) {
+    .finder { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLFormElement>('[data-trip-finder]').forEach((form) => {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = new FormData(form);
+      const when = String(data.get('when') || '');
+      const month = when
+        ? new Date(`${when}-01`).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })
+        : 'flexible dates';
+      const msg = [
+        'Hi Aaroma Holidays, I would like a quote.',
+        `Destination: ${data.get('where')}`,
+        `When: ${month}`,
+        `Length: ${data.get('days')}`,
+        `Travellers: ${data.get('people')}`,
+      ].join('\n');
+      window.open(`https://wa.me/${form.dataset.wa}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
+    });
+  });
+</script>

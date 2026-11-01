@@ -1,0 +1,181 @@
+---
+import TripFinder from './TripFinder.astro';
+import { whatsappLink } from '../data/site';
+
+interface Props {
+  /** Real hero photo, e.g. "/images/hero-kanchenjunga.jpg". Until set, an illustrated placeholder is shown. */
+  src?: string;
+}
+const { src } = Astro.props;
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="frame" data-hero>
+    {src ? (
+      <img class="art" src={src} alt="Kanchenjunga at sunrise, seen from Tiger Hill" fetchpriority="high" />
+    ) : (
+      <svg class="art" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Kanchenjunga at sunrise, seen from the Darjeeling hills">
+        <defs>
+          <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#173f4b" />
+            <stop offset="0.45" stop-color="#5c8c98" />
+            <stop offset="0.72" stop-color="#d9c3ad" />
+            <stop offset="1" stop-color="#f1d2b4" />
+          </linearGradient>
+          <linearGradient id="snow" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#fbe3cc" class="glow-top" />
+            <stop offset="0.55" stop-color="#eef1f1" />
+            <stop offset="1" stop-color="#c9d6d8" />
+          </linearGradient>
+          <linearGradient id="haze" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#ffffff" stop-opacity="0" />
+            <stop offset="0.45" stop-color="#ffffff" stop-opacity="0.75" />
+            <stop offset="1" stop-color="#ffffff" stop-opacity="0" />
+          </linearGradient>
+          <linearGradient id="shade" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0" stop-color="#000" stop-opacity="0.55" />
+            <stop offset="0.55" stop-color="#000" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+
+        <rect width="1600" height="1000" fill="url(#sky)" />
+
+        <!-- Kanchenjunga massif: Kabru (left), the main summits, Pandim (right) -->
+        <path
+          class="massif"
+          d="M120 660 L300 540 L380 560 L470 470 L530 505 L600 452 L660 482 L742 378 L792 408 L842 292 L880 330 L922 308 L980 388 L1042 366 L1110 446 L1170 414 L1242 498 L1330 468 L1470 600 L1600 640 V720 H0 Z"
+          fill="url(#snow)"
+        />
+        <!-- shadowed faces -->
+        <path d="M842 292 L880 330 L870 420 L820 470 L800 420 Z" fill="#9db4bb" opacity="0.55" />
+        <path d="M922 308 L980 388 L955 470 L905 420 Z" fill="#9db4bb" opacity="0.5" />
+        <path d="M470 470 L530 505 L505 560 L455 540 Z" fill="#9db4bb" opacity="0.5" />
+        <path d="M1170 414 L1242 498 L1205 540 L1160 500 Z" fill="#9db4bb" opacity="0.5" />
+        <path d="M742 378 L792 408 L770 480 L728 450 Z" fill="#9db4bb" opacity="0.45" />
+
+        <!-- cloud band in the valleys -->
+        <rect y="520" width="1600" height="220" fill="url(#haze)" />
+
+        <!-- foothills -->
+        <path d="M0 700 C180 640 320 690 480 650 C640 610 760 680 920 640 C1080 600 1240 660 1400 630 C1500 612 1560 625 1600 620 V1000 H0 Z" fill="#7d9ea5" />
+        <path d="M0 780 C160 740 300 790 470 750 C650 708 800 780 980 740 C1160 700 1320 770 1600 720 V1000 H0 Z" fill="#3f6f73" />
+        <path d="M0 860 C200 820 380 880 600 840 C820 800 1000 870 1240 830 C1400 805 1520 830 1600 815 V1000 H0 Z" fill="#163f40" />
+
+        <rect width="1600" height="1000" fill="url(#shade)" />
+      </svg>
+    )}
+
+    <div class="scrim" aria-hidden="true"></div>
+    <div class="content wrap">
+      <h1 id="hero-title">Wake up facing Kanchenjunga</h1>
+      <div class="side">
+        <p>
+          Private tours, cabs and stays across Darjeeling and Sikkim, planned by a local team
+          based in Bijanbari, Darjeeling.
+        </p>
+        <div class="actions">
+          <a class="btn btn--white" href="/itineraries/">See itineraries</a>
+          <a class="btn btn--line" href={whatsappLink('Hi Aaroma Holidays, I would like help planning a trip.')} target="_blank" rel="noopener">
+            Ask on WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="finder wrap">
+    <TripFinder />
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    padding: clamp(0.5rem, 0.25rem + 1vw, 1rem);
+  }
+
+  .frame {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    min-height: max(620px, min(calc(100svh - 2rem), 920px));
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    background: #173f4b;
+    color: var(--white);
+  }
+
+  .art {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  img.art { filter: saturate(1.05); }
+  /* Keeps the headline readable over snow or a bright photo. */
+  .scrim {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgb(6 38 40 / 0.62) 0%, rgb(6 38 40 / 0.25) 45%, transparent 70%),
+      linear-gradient(0deg, rgb(6 38 40 / 0.55) 0%, transparent 45%);
+  }
+
+  .content {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    align-items: end;
+    gap: 2rem 4rem;
+    padding-top: 8rem;
+    padding-bottom: clamp(7rem, 5rem + 6vw, 10rem);
+  }
+
+  h1 {
+    color: var(--white);
+    font-size: clamp(3rem, 1.4rem + 6.4vw, 6.75rem);
+    font-weight: 500;
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+    max-width: 10ch;
+  }
+
+  .side { display: grid; gap: 1.75rem; max-width: 40ch; }
+  .side p { font-size: var(--step-1); line-height: 1.45; color: rgb(255 255 255 / 0.92); }
+
+  .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+  .actions .btn--line { color: var(--white); }
+  .actions .btn--line:hover { background: var(--white); border-color: var(--white); color: var(--ink); }
+
+  .finder {
+    position: relative;
+    z-index: 2;
+    margin-top: -4.5rem;
+  }
+
+  /* The one orchestrated moment: sunrise warms the peaks while the headline rises. */
+  @media (prefers-reduced-motion: no-preference) {
+    .massif { animation: alpenglow 2.6s var(--ease) both; }
+    h1 { animation: rise 1.1s 0.15s var(--ease) both; }
+    .side { animation: rise 1.1s 0.35s var(--ease) both; }
+    .finder { animation: rise 1s 0.6s var(--ease) both; }
+  }
+
+  @keyframes alpenglow {
+    from { filter: brightness(0.7) saturate(0.6); }
+    to { filter: none; }
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  @media (max-width: 860px) {
+    .content { grid-template-columns: 1fr; padding-bottom: 3rem; }
+    .scrim { background: linear-gradient(0deg, rgb(6 38 40 / 0.8) 0%, rgb(6 38 40 / 0.35) 60%, transparent 85%); }
+    .frame { min-height: 640px; }
+    .finder { margin-top: 1rem; padding-inline: 0; }
+  }
+</style>

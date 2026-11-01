@@ -1,0 +1,124 @@
+---
+import Base from '../../layouts/Base.astro';
+import PackageCard from '../../components/PackageCard.astro';
+import EnquiryBand from '../../components/EnquiryBand.astro';
+import { packages, tagLabels, type Tag } from '../../data/packages';
+
+const tags = Object.keys(tagLabels) as Tag[];
+---
+
+<Base
+  title="Itineraries"
+  description="Day-by-day tour itineraries for Darjeeling, Gangtok, North Sikkim, Kalimpong and the Dooars, with starting prices."
+>
+  <header class="page-head wrap">
+    <h1>Itineraries</h1>
+    <p class="lede">
+      Day-by-day plans for Darjeeling, Sikkim and the Dooars. Pick one as it is, or use it as a
+      starting point and we’ll change it to fit your dates.
+    </p>
+  </header>
+
+  <section class="wrap list-section" aria-label="All itineraries">
+    <div class="filters" role="group" aria-label="Filter by trip type" data-filters>
+      <button type="button" aria-pressed="true" data-filter="all">All trips</button>
+      {tags.map((t) => (
+        <button type="button" aria-pressed="false" data-filter={t}>{tagLabels[t]}</button>
+      ))}
+    </div>
+
+    <p class="count" aria-live="polite" data-count>{packages.length} trips</p>
+
+    <div class="grid" data-grid>
+      {packages.map((p) => <PackageCard pkg={p} headingLevel="h2" />)}
+    </div>
+
+    <p class="fineprint">
+      Prices are starting prices. Your final quote depends on travel dates, hotel category and group size.
+    </p>
+  </section>
+
+  <EnquiryBand />
+</Base>
+
+<style>
+  .list-section { padding-bottom: var(--section); }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding-block: 1.5rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .filters button {
+    min-height: 44px;
+    padding: 0.5rem 1.1rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--white);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s var(--ease), border-color 0.2s var(--ease), color 0.2s var(--ease);
+  }
+  .filters button:hover { border-color: var(--teal); }
+  .filters button[aria-pressed='true'] {
+    background: var(--teal);
+    border-color: var(--teal);
+    color: var(--white);
+  }
+
+  .count {
+    margin-bottom: 2rem;
+    color: var(--ink-muted);
+    font-size: var(--step--1);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(2rem, 1.5rem + 1.5vw, 3rem) clamp(1rem, 0.5rem + 1.5vw, 2rem);
+  }
+
+  .grid :global([hidden]) { display: none; }
+
+  .fineprint {
+    margin-top: 3rem;
+    color: var(--ink-muted);
+    font-size: var(--step--1);
+  }
+
+  @media (max-width: 960px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+</style>
+
+<script>
+  const filters = document.querySelector('[data-filters]');
+  const cards = [...document.querySelectorAll<HTMLElement>('[data-grid] .card')];
+  const count = document.querySelector('[data-count]');
+
+  const apply = (tag: string) => {
+    let shown = 0;
+    cards.forEach((c) => {
+      const match = tag === 'all' || (c.dataset.tags ?? '').split(' ').includes(tag);
+      c.hidden = !match;
+      if (match) shown++;
+    });
+    if (count) count.textContent = `${shown} ${shown === 1 ? 'trip' : 'trips'}`;
+  };
+
+  filters?.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-filter]');
+    if (!btn) return;
+    filters.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+    apply(btn.dataset.filter!);
+    const url = new URL(location.href);
+    btn.dataset.filter === 'all' ? url.searchParams.delete('type') : url.searchParams.set('type', btn.dataset.filter!);
+    history.replaceState(null, '', url);
+  });
+
+  // Support links like /itineraries/?type=honeymoon
+  const initial = new URLSearchParams(location.search).get('type');
+  if (initial) filters?.querySelector<HTMLButtonElement>(`[data-filter="${CSS.escape(initial)}"]`)?.click();
+</script>

@@ -1,0 +1,240 @@
+---
+import { nav, whatsappLink } from '../data/site';
+import Logo from './Logo.astro';
+
+interface Props {
+  overlay?: boolean;
+}
+const { overlay = false } = Astro.props;
+
+const path = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === '/' ? path === '/' : path.startsWith(href);
+
+const planLink = whatsappLink('Hi Aaroma Holidays, I would like help planning a trip.');
+---
+
+<header class:list={['site-header', overlay ? 'is-overlay' : 'is-solid']} data-overlay={overlay ? '' : undefined}>
+  <div class="bar">
+    <a href="/" class="brand" aria-label="Aaroma Holidays, home">
+      <Logo />
+    </a>
+
+    <nav aria-label="Main">
+      <ul class="links" id="site-menu">
+        {nav.map((item) => (
+          <li>
+            <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
+              {item.label}
+            </a>
+          </li>
+        ))}
+        <li class="menu-cta">
+          <a class="btn btn--teal" href={planLink} target="_blank" rel="noopener">Plan my trip</a>
+        </li>
+      </ul>
+    </nav>
+
+    <a class="btn cta" href={planLink} target="_blank" rel="noopener">Plan my trip</a>
+
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu">
+      <span class="visually-hidden">Menu</span>
+      <span class="bars" aria-hidden="true"></span>
+    </button>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 50;
+    padding: clamp(0.75rem, 0.5rem + 1vw, 1.5rem) var(--gutter) 0;
+    pointer-events: none;
+  }
+
+  .bar {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    max-width: calc(var(--max) - 2 * var(--gutter));
+    margin-inline: auto;
+    padding: 0.5rem 0.5rem 0.5rem 1.25rem;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    transition: background-color 0.35s var(--ease), border-color 0.35s var(--ease), color 0.35s var(--ease);
+  }
+
+  /* Glass over the hero photo */
+  .is-overlay .bar {
+    color: var(--white);
+    background: rgb(255 255 255 / 0.14);
+    border-color: rgb(255 255 255 / 0.22);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+  }
+
+  /* Solid on white pages and after scrolling past the hero */
+  .is-solid .bar {
+    color: var(--ink);
+    background: rgb(255 255 255 / 0.92);
+    border-color: var(--line);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .brand {
+    display: inline-flex;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  nav { margin-left: auto; }
+
+  .links {
+    display: flex;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .links a:not(.btn) {
+    display: inline-block;
+    padding: 0.55rem 0.9rem;
+    border-radius: 999px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.2s var(--ease);
+  }
+
+  .is-overlay .links a:not(.btn):hover { background: rgb(255 255 255 / 0.16); }
+  .is-solid .links a:not(.btn):hover { background: var(--teal-wash); }
+
+  .links a[aria-current='page'] {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.4em;
+  }
+
+  .menu-cta { display: none; }
+
+  .is-overlay .cta { background: var(--white); color: var(--ink); }
+  .is-solid .cta { background: var(--teal); color: var(--white); }
+  .is-solid .cta:hover { background: var(--teal-deep); }
+
+  .menu-toggle {
+    display: none;
+    width: 48px;
+    height: 48px;
+    margin-left: auto;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .bars,
+  .bars::before,
+  .bars::after {
+    display: block;
+    width: 20px;
+    height: 1.5px;
+    margin-inline: auto;
+    background: currentColor;
+    transition: transform 0.25s var(--ease);
+  }
+  .bars { position: relative; }
+  .bars::before, .bars::after { content: ''; position: absolute; left: 0; }
+  .bars::before { top: -6px; }
+  .bars::after { top: 6px; }
+
+  .menu-toggle[aria-expanded='true'] .bars { background: transparent; }
+  .menu-toggle[aria-expanded='true'] .bars::before { transform: translateY(6px) rotate(45deg); }
+  .menu-toggle[aria-expanded='true'] .bars::after { transform: translateY(-6px) rotate(-45deg); }
+
+  @media (max-width: 860px) {
+    .cta { display: none; }
+    .menu-toggle { display: block; }
+    nav { margin-left: 0; }
+
+    .links {
+      position: absolute;
+      top: calc(100% + 0.5rem);
+      left: var(--gutter);
+      right: var(--gutter);
+      flex-direction: column;
+      gap: 0;
+      padding: 0.75rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--white);
+      color: var(--ink);
+      box-shadow: 0 24px 48px -24px rgb(7 67 65 / 0.35);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-8px);
+      transition: opacity 0.25s var(--ease), transform 0.25s var(--ease), visibility 0.25s;
+    }
+
+    .links.is-open {
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+    }
+
+    .links a:not(.btn) {
+      display: block;
+      padding: 0.9rem 1rem;
+      font-size: var(--step-1);
+    }
+    .links a:not(.btn):hover { background: var(--teal-wash); }
+
+    .menu-cta { display: block; padding: 0.5rem 0.25rem 0.25rem; }
+    .menu-cta .btn { width: 100%; }
+
+    .site-header { position: fixed; }
+    .site-header .bar { position: relative; }
+  }
+</style>
+
+<script>
+  const header = document.querySelector<HTMLElement>('.site-header');
+  const toggle = header?.querySelector<HTMLButtonElement>('.menu-toggle');
+  const menu = header?.querySelector<HTMLElement>('#site-menu');
+
+  toggle?.addEventListener('click', () => {
+    const open = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!open));
+    menu?.classList.toggle('is-open', !open);
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && toggle?.getAttribute('aria-expanded') === 'true') {
+      toggle.setAttribute('aria-expanded', 'false');
+      menu?.classList.remove('is-open');
+      toggle.focus();
+    }
+  });
+
+  // On the home page the header is glass over the hero, then turns solid.
+  if (header?.hasAttribute('data-overlay')) {
+    const hero = document.querySelector('[data-hero]');
+    if (hero) {
+      const io = new IntersectionObserver(
+        ([entry]) => {
+          const past = !entry.isIntersecting;
+          header.classList.toggle('is-solid', past);
+          header.classList.toggle('is-overlay', !past);
+        },
+        { rootMargin: '-96px 0px 0px 0px', threshold: 0 },
+      );
+      // Watch a sentinel near the bottom of the hero.
+      const sentinel = document.createElement('div');
+      sentinel.style.cssText = 'position:absolute;left:0;bottom:120px;height:1px;width:1px;';
+      hero.appendChild(sentinel);
+      io.observe(sentinel);
+    }
+  }
+</script>

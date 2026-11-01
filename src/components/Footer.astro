@@ -1,0 +1,105 @@
+---
+import { site, nav, whatsappLink } from '../data/site';
+import { packages } from '../data/packages';
+import Logo from './Logo.astro';
+import RidgeLine from './RidgeLine.astro';
+
+const popular = packages.filter((p) => p.featured).slice(0, 5);
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <RidgeLine />
+  <div class="wrap grid">
+    <div class="about">
+      <Logo />
+      <p>{site.tagline}</p>
+      <a class="btn btn--white" href={whatsappLink('Hi Aaroma Holidays, I would like help planning a trip.')} target="_blank" rel="noopener">
+        Chat on WhatsApp
+      </a>
+    </div>
+
+    <div>
+      <h2>Explore</h2>
+      <ul>
+        {nav.map((n) => <li><a href={n.href}>{n.label}</a></li>)}
+      </ul>
+    </div>
+
+    <div>
+      <h2>Popular trips</h2>
+      <ul>
+        {popular.map((p) => <li><a href={`/itineraries/${p.slug}/`}>{p.title}</a></li>)}
+      </ul>
+    </div>
+
+    <div>
+      <h2>Contact</h2>
+      <ul>
+        {site.phones.map((ph) => <li><a href={`tel:${ph.tel}`}>{ph.display}</a></li>)}
+        <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
+        <li class="addr">{site.address.line1}<br />{site.address.line2}</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="wrap base">
+    <p>© {year} {site.name}. All rights reserved.</p>
+    <ul class="social">
+      {site.social.facebook && <li><a href={site.social.facebook} rel="noopener">Facebook</a></li>}
+      {site.social.instagram && <li><a href={site.social.instagram} rel="noopener">Instagram</a></li>}
+    </ul>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--teal-deep);
+    color: rgb(255 255 255 / 0.78);
+    padding-bottom: 2rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1.4fr repeat(3, 1fr);
+    gap: 3rem 2rem;
+    padding-block: 3.5rem 4rem;
+  }
+
+  .about { display: grid; gap: 1.25rem; align-content: start; justify-items: start; color: var(--white); }
+  .about p { max-width: 32ch; color: rgb(255 255 255 / 0.78); }
+
+  h2 {
+    margin-bottom: 1rem;
+    color: var(--white);
+    font-family: var(--font-body);
+    font-size: var(--step-0);
+    font-weight: 600;
+  }
+
+  ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.6rem; }
+
+  a { text-decoration: none; }
+  ul a:hover { color: var(--white); text-decoration: underline; text-underline-offset: 0.3em; }
+
+  .addr { line-height: 1.5; }
+
+  .base {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgb(255 255 255 / 0.14);
+    font-size: var(--step--1);
+  }
+  .social { display: flex; gap: 1.5rem; }
+
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr 1fr; }
+    .about { grid-column: 1 / -1; }
+  }
+  @media (max-width: 520px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
