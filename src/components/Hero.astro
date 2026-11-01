@@ -105,7 +105,7 @@ const { src, srcPhone } = Astro.props;
     position: relative;
     isolation: isolate;
     display: flex;
-    align-items: flex-start;
+    align-items: stretch;
     min-height: max(620px, min(calc(100svh - 2rem), 920px));
     overflow: hidden;
     border-radius: var(--radius-lg);
@@ -178,13 +178,18 @@ const { src, srcPhone } = Astro.props;
       linear-gradient(180deg, rgb(5 70 68 / 0.5) 0%, rgb(5 70 68 / 0.2) 40%, transparent 58%);
   }
 
+  /* Headline in the sky at the top, buttons at the bottom of the hero */
   .content {
     position: relative;
     z-index: 2;
-    display: grid;
-    justify-items: center;
-    gap: clamp(1.5rem, 1rem + 1.5vw, 2.25rem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
     padding-top: clamp(7rem, 5rem + 5vh, 10rem);
+    /* clears the trip finder that overlaps the bottom edge on desktop */
+    padding-bottom: clamp(6.75rem, 5.5rem + 2vw, 8rem);
     text-align: center;
   }
 
@@ -271,16 +276,16 @@ const { src, srcPhone } = Astro.props;
   }
 
   @media (max-width: 860px) {
-    .content { padding-top: 7.5rem; }
+    .content { padding-top: 7.5rem; padding-bottom: 2rem; }
     .scrim { background: linear-gradient(180deg, rgb(5 70 68 / 0.6) 0%, rgb(5 70 68 / 0.25) 45%, transparent 65%); }
     .frame { min-height: 640px; }
     .finder { margin-top: 1rem; padding-inline: 0; }
   }
 
-  /* Phones: taller hero, headline higher, buttons on one row above the peaks */
+  /* Phones: shorter hero, headline higher, buttons on one row */
   @media (max-width: 600px) {
-    .frame { min-height: max(660px, 84svh); }
-    .content { padding-top: 6.25rem; gap: 1.25rem; }
+    .frame { min-height: max(530px, 67svh); }
+    .content { padding-top: 6.25rem; padding-bottom: 1.5rem; }
     .actions { flex-wrap: nowrap; gap: 0.5rem; }
     .actions .btn { min-height: 44px; padding: 0.6rem 1rem; font-size: 0.9375rem; white-space: nowrap; }
   }
