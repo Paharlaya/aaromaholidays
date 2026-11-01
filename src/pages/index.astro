@@ -7,8 +7,7 @@ import Gallery from '../components/Gallery.astro';
 import EnquiryBand from '../components/EnquiryBand.astro';
 import { packages } from '../data/packages';
 
-const featured = packages.filter((p) => p.featured);
-const [lead, ...rest] = featured;
+const featured = packages.filter((p) => p.featured).slice(0, 6);
 
 const reasons = [
   {
@@ -44,8 +43,7 @@ const reasons = [
       </div>
 
       <div class="popular">
-        <div class="lead"><PackageCard pkg={lead} large /></div>
-        {rest.map((p) => <PackageCard pkg={p} />)}
+        {featured.map((p) => <PackageCard pkg={p} />)}
       </div>
     </div>
   </section>
@@ -92,10 +90,9 @@ const reasons = [
 
   .popular {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: clamp(2rem, 1.5rem + 1.5vw, 3rem) clamp(1rem, 0.5rem + 1.5vw, 2rem);
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(2.5rem, 2rem + 1.5vw, 3.5rem) clamp(1rem, 0.5rem + 1.5vw, 2rem);
   }
-  .lead { grid-column: span 2; grid-row: span 2; }
 
   .why {
     display: grid;
@@ -114,7 +111,7 @@ const reasons = [
     gap: 1.75rem 2rem;
     margin: 0.5rem 0;
     padding-top: 1.75rem;
-    border-top: 1px solid rgb(11 93 91 / 0.2);
+    border-top: 1px solid rgb(14 124 120 / 0.25);
   }
 
   dt {
@@ -126,14 +123,12 @@ const reasons = [
 
   @media (max-width: 960px) {
     .popular { grid-template-columns: repeat(2, 1fr); }
-    .lead { grid-row: auto; }
     .why { grid-template-columns: 1fr; }
     .why-media { max-width: 520px; }
   }
 
   @media (max-width: 600px) {
     .popular { grid-template-columns: 1fr; }
-    .lead { grid-column: auto; }
     .reasons { grid-template-columns: 1fr; }
   }
 </style>

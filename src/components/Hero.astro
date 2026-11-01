@@ -17,9 +17,9 @@ const { src } = Astro.props;
       <svg class="art" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Kanchenjunga at sunrise, seen from the Darjeeling hills">
         <defs>
           <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#173f4b" />
-            <stop offset="0.45" stop-color="#5c8c98" />
-            <stop offset="0.72" stop-color="#d9c3ad" />
+            <stop offset="0" stop-color="#0f6a6c" />
+            <stop offset="0.45" stop-color="#4fa5a6" />
+            <stop offset="0.72" stop-color="#cfe0d6" />
             <stop offset="1" stop-color="#f1d2b4" />
           </linearGradient>
           <linearGradient id="snow" x1="0" y1="0" x2="0" y2="1">
@@ -33,7 +33,7 @@ const { src } = Astro.props;
             <stop offset="1" stop-color="#ffffff" stop-opacity="0" />
           </linearGradient>
           <linearGradient id="shade" x1="0" y1="1" x2="0" y2="0">
-            <stop offset="0" stop-color="#000" stop-opacity="0.55" />
+            <stop offset="0" stop-color="#063f3d" stop-opacity="0.5" />
             <stop offset="0.55" stop-color="#000" stop-opacity="0" />
           </linearGradient>
         </defs>
@@ -57,9 +57,9 @@ const { src } = Astro.props;
         <rect y="520" width="1600" height="220" fill="url(#haze)" />
 
         <!-- foothills -->
-        <path d="M0 700 C180 640 320 690 480 650 C640 610 760 680 920 640 C1080 600 1240 660 1400 630 C1500 612 1560 625 1600 620 V1000 H0 Z" fill="#7d9ea5" />
-        <path d="M0 780 C160 740 300 790 470 750 C650 708 800 780 980 740 C1160 700 1320 770 1600 720 V1000 H0 Z" fill="#3f6f73" />
-        <path d="M0 860 C200 820 380 880 600 840 C820 800 1000 870 1240 830 C1400 805 1520 830 1600 815 V1000 H0 Z" fill="#163f40" />
+        <path d="M0 700 C180 640 320 690 480 650 C640 610 760 680 920 640 C1080 600 1240 660 1400 630 C1500 612 1560 625 1600 620 V1000 H0 Z" fill="#6fb0ad" />
+        <path d="M0 780 C160 740 300 790 470 750 C650 708 800 780 980 740 C1160 700 1320 770 1600 720 V1000 H0 Z" fill="#2f8a86" />
+        <path d="M0 860 C200 820 380 880 600 840 C820 800 1000 870 1240 830 C1400 805 1520 830 1600 815 V1000 H0 Z" fill="#0f5f5c" />
 
         <rect width="1600" height="1000" fill="url(#shade)" />
       </svg>
@@ -101,7 +101,7 @@ const { src } = Astro.props;
     min-height: max(620px, min(calc(100svh - 2rem), 920px));
     overflow: hidden;
     border-radius: var(--radius-lg);
-    background: #173f4b;
+    background: #0f6a6c;
     color: var(--white);
   }
 
@@ -119,8 +119,8 @@ const { src } = Astro.props;
     position: absolute;
     inset: 0;
     background:
-      linear-gradient(90deg, rgb(6 38 40 / 0.62) 0%, rgb(6 38 40 / 0.25) 45%, transparent 70%),
-      linear-gradient(0deg, rgb(6 38 40 / 0.55) 0%, transparent 45%);
+      linear-gradient(90deg, rgb(5 70 68 / 0.6) 0%, rgb(5 70 68 / 0.22) 45%, transparent 70%),
+      linear-gradient(0deg, rgb(5 70 68 / 0.5) 0%, transparent 45%);
   }
 
   .content {
@@ -174,7 +174,7 @@ const { src } = Astro.props;
 
   @media (max-width: 860px) {
     .content { grid-template-columns: 1fr; padding-bottom: 3rem; }
-    .scrim { background: linear-gradient(0deg, rgb(6 38 40 / 0.8) 0%, rgb(6 38 40 / 0.35) 60%, transparent 85%); }
+    .scrim { background: linear-gradient(0deg, rgb(5 70 68 / 0.82) 0%, rgb(5 70 68 / 0.4) 60%, transparent 85%); }
     .frame { min-height: 640px; }
     .finder { margin-top: 1rem; padding-inline: 0; }
   }

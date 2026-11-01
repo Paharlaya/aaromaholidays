@@ -135,6 +135,7 @@ export const packages: Package[] = [
     nights: 4,
     priceFrom: 12000,
     tags: ['classic'],
+    featured: true,
     summary: 'Gangtok and the quieter south of Sikkim, with the giant statues at Samdruptse and Char Dham.',
     image: { label: 'Samdruptse statue above the clouds', tone: 'dawn' },
     highlights: ['Tsomgo Lake', 'Char Dham', 'Samdruptse', 'Rumtek Monastery'],

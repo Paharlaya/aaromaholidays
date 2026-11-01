@@ -2,12 +2,12 @@
 :root {
   --white: #ffffff;
   --ink: #000000;
-  --ink-soft: #3d4645;
+  --ink-soft: #3a4847;
   --ink-muted: #6b7675;
-  --teal: #0b5d5b;
-  --teal-deep: #074341;
-  --teal-wash: #e6f0ef;
-  --line: #dde6e5;
+  --teal: #0e7c78;
+  --teal-deep: #0a6662;
+  --teal-wash: #e2f2f0;
+  --line: #d6e7e5;
   --dawn: #e8b48a;
 
   --font-display: 'Bodoni Moda', 'Didot', 'Bodoni 72', Georgia, serif;
@@ -208,7 +208,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .field textarea:focus {
   outline: none;
   border-color: var(--teal);
-  box-shadow: 0 0 0 3px rgb(11 93 91 / 0.18);
+  box-shadow: 0 0 0 3px rgb(14 124 120 / 0.2);
 }
 
 /* ---------- Page header (inner pages) ---------- */
