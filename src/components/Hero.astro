@@ -14,7 +14,7 @@ const { src } = Astro.props;
   <div class="frame" data-hero>
     <div class="parallax" data-parallax>
     {src ? (
-      <img class="art photo-art" src={url(src)} alt="Kanchenjunga rising above the clouds, seen from the Darjeeling hills" fetchpriority="high" decoding="async" />
+      <img class="art photo-art" src={url(src)} alt="Kanchenjunga lit by the morning sun under a wide blue sky" fetchpriority="high" decoding="async" />
     ) : (
       <svg class="art" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Kanchenjunga at sunrise, seen from the Darjeeling hills">
         <defs>
@@ -124,17 +124,17 @@ const { src } = Astro.props;
 
   /* Real photo: frame the peaks, tint slightly toward the site's teal */
   .photo-art {
-    object-position: 50% 62%;
-    filter: saturate(0.92) hue-rotate(-12deg);
+    object-position: 62% 50%;
+    filter: saturate(0.95) hue-rotate(-6deg);
   }
   /* A faint band of valley cloud that drifts slowly across the foothills */
   .cloud-band {
     position: absolute;
     left: 0;
-    top: 52%;
+    top: 66%;
     width: 200%;
-    height: 22%;
-    opacity: 0.45;
+    height: 16%;
+    opacity: 0.22;
     mix-blend-mode: screen;
     background:
       radial-gradient(ellipse 9% 40% at 6% 55%, #fff, transparent 70%),
@@ -175,7 +175,7 @@ const { src } = Astro.props;
     display: grid;
     justify-items: center;
     gap: clamp(1.5rem, 1rem + 1.5vw, 2.25rem);
-    padding-top: clamp(8rem, 6rem + 6vh, 12rem);
+    padding-top: clamp(7rem, 5rem + 5vh, 10rem);
     text-align: center;
   }
 
@@ -242,7 +242,7 @@ const { src } = Astro.props;
   }
   @keyframes cloud-in {
     from { opacity: 0; }
-    to { opacity: 0.45; }
+    to { opacity: 0.22; }
   }
   @keyframes cloud-drift {
     to { transform: translateX(-50%); }
