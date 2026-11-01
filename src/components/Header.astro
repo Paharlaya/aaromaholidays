@@ -121,6 +121,14 @@ const planLink = whatsappLink('Hi Aaroma Holidays, I would like help planning a 
 
   .menu-cta { display: none; }
 
+  @media (prefers-reduced-motion: no-preference) {
+    [data-overlay] .bar { animation: nav-drop 0.9s 1.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  }
+  @keyframes nav-drop {
+    from { opacity: 0; transform: translateY(-14px); }
+    to { opacity: 1; transform: none; }
+  }
+
   .is-overlay .cta { background: var(--white); color: var(--ink); }
   .is-solid .cta { background: var(--teal); color: var(--white); }
   .is-solid .cta:hover { background: var(--teal-deep); }
@@ -219,23 +227,22 @@ const planLink = whatsappLink('Hi Aaroma Holidays, I would like help planning a 
     }
   });
 
-  // On the home page the header is glass over the hero, then turns solid.
+  // On the home page the header is glass over the hero, then turns solid
+  // once the hero has scrolled away.
   if (header?.hasAttribute('data-overlay')) {
-    const hero = document.querySelector('[data-hero]');
+    const hero = document.querySelector<HTMLElement>('[data-hero]');
     if (hero) {
-      const io = new IntersectionObserver(
-        ([entry]) => {
-          const past = !entry.isIntersecting;
-          header.classList.toggle('is-solid', past);
-          header.classList.toggle('is-overlay', !past);
-        },
-        { rootMargin: '-96px 0px 0px 0px', threshold: 0 },
-      );
-      // Watch a sentinel near the bottom of the hero.
-      const sentinel = document.createElement('div');
-      sentinel.style.cssText = 'position:absolute;left:0;bottom:120px;height:1px;width:1px;';
-      hero.appendChild(sentinel);
-      io.observe(sentinel);
+      let ticking = false;
+      const update = () => {
+        const past = window.scrollY > hero.offsetTop + hero.offsetHeight - 120;
+        header.classList.toggle('is-solid', past);
+        header.classList.toggle('is-overlay', !past);
+        ticking = false;
+      };
+      window.addEventListener('scroll', () => {
+        if (!ticking) { ticking = true; requestAnimationFrame(update); }
+      }, { passive: true });
+      update();
     }
   }
 </script>
