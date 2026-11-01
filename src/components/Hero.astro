@@ -6,15 +6,20 @@ import { whatsappLink } from '../data/site';
 interface Props {
   /** Real hero photo, e.g. "/images/hero-kanchenjunga.webp". Until set, an illustrated placeholder is shown. */
   src?: string;
+  /** Portrait photo for phones (screens up to 600px wide). Falls back to `src`. */
+  srcPhone?: string;
 }
-const { src } = Astro.props;
+const { src, srcPhone } = Astro.props;
 ---
 
 <section class="hero" aria-labelledby="hero-title">
   <div class="frame" data-hero>
     <div class="parallax" data-parallax>
     {src ? (
-      <img class="art photo-art" src={url(src)} alt="Kanchenjunga lit by the morning sun under a wide blue sky" fetchpriority="high" decoding="async" />
+      <picture>
+        {srcPhone && <source media="(max-width: 600px)" srcset={url(srcPhone)} type="image/webp" />}
+        <img class="art photo-art" src={url(src)} alt="Kanchenjunga lit by the morning sun under a wide blue sky" fetchpriority="high" decoding="async" />
+      </picture>
     ) : (
       <svg class="art" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Kanchenjunga at sunrise, seen from the Darjeeling hills">
         <defs>
@@ -126,6 +131,10 @@ const { src } = Astro.props;
   .photo-art {
     object-position: 62% 50%;
     filter: saturate(0.95) hue-rotate(-6deg);
+  }
+  /* Phones get the portrait photo: keep the peaks just below the headline */
+  @media (max-width: 600px) {
+    .photo-art { object-position: 50% 40%; }
   }
   /* A faint band of valley cloud that drifts slowly across the foothills */
   .cloud-band {
@@ -266,6 +275,14 @@ const { src } = Astro.props;
     .scrim { background: linear-gradient(180deg, rgb(5 70 68 / 0.6) 0%, rgb(5 70 68 / 0.25) 45%, transparent 65%); }
     .frame { min-height: 640px; }
     .finder { margin-top: 1rem; padding-inline: 0; }
+  }
+
+  /* Phones: taller hero, headline higher, buttons on one row above the peaks */
+  @media (max-width: 600px) {
+    .frame { min-height: max(660px, 84svh); }
+    .content { padding-top: 6.25rem; gap: 1.25rem; }
+    .actions { flex-wrap: nowrap; gap: 0.5rem; }
+    .actions .btn { min-height: 44px; padding: 0.6rem 1rem; font-size: 0.9375rem; white-space: nowrap; }
   }
 </style>
 
